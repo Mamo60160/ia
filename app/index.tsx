@@ -1,182 +1,256 @@
-import React from "react";
-import { View, Text, TextInput, Image, TouchableOpacity, ScrollView, FlatList } from "react-native";
 
-const flightsData = [
-  {
-    id: '1',
-    from: 'ENG',
-    to: 'SFO',
-    duration: '2h 35m',
-    departure: 'Feb 25, 11:30pm',
-    flightNumber: 'AB8689',
-    price: '$500',
-  },
-  {
-    id: '2',
-    from: 'CDG',
-    to: 'JFK',
-    duration: '7h 50m',
-    departure: 'Feb 26, 2:00pm',
-    flightNumber: 'AF102',
-    price: '$750',
-  },
-];
+import React, { useState } from 'react';
+import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import askGPT from './server'; 
+const App = () => {
+  const [gptResponse, setGptResponse] = useState('');
 
-const popularPlacesData = [
-  {
-    id: '1',
-    image: 'https://www.dubai.it/fr/wp-content/uploads/sites/143/dubai-marina.jpg',
-    name: 'Dubai',
-  },
-  {
-    id: '2',
-    image: 'https://lp-cms-production.imgix.net/2024-05/shutterstockRF704449474-color.jpg?w=1440&h=810&fit=crop&auto=format&q=75',
-    name: 'Switzerland',
-  },
-];
-
-export default function App() {
-  const renderFlight = ({ item }) => (
-    <View
-      style={{
-        backgroundColor: '#fff',
-        marginVertical: 10,
-        padding:14,
-        borderRadius: 10,
-        shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 5,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.from}</Text>
-        {/* Remplacer l'icône par un texte */}
-        <Text style={{ marginHorizontal: 10 }}>✈️</Text>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{item.to}</Text>
-      </View>
-      <View>
-        <Text>{item.duration}</Text>
-        <Text>{item.departure}</Text>
-      </View>
-      <View>
-        <Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.price}</Text>
-      </View>
-    </View>
-  );
-
-  const renderPopularPlace = ({ item }) => (
-    <TouchableOpacity style={{ marginRight: 10 }}>
-      <Image
-        source={{ uri: item.image }}
-        style={{ width: 150, height: 150, borderRadius: 10 }}
-      />
-      <Text style={{ textAlign: 'center', marginTop: 5, fontWeight: 'bold' }}>{item.name}</Text>
-    </TouchableOpacity>
-  );
+  // Fonction pour gérer l'appel à GPT lors du clic
+  const handleGPTClick = async () => {
+    const response = await askGPT('Quels sont les meilleurs endroits pour voyager ?');  // Exemple de question
+    setGptResponse(response);
+    Alert.alert('Réponse GPT', response);  // Affiche la réponse dans une alerte
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#F8F8F8" }}>
-      {}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 36, alignItems: 'center' }}>
-        <Text style={{ fontSize: 18, color: '#cc2a4b', fontWeight: 'bold' }}>TUI</Text>
-        <Image
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/5556/5556468.png' }}
-          style={{ width: 40, height: 40, borderRadius: 20 }}
+    <ScrollView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.logo}>TUI</Text>
+        <TouchableOpacity>
+          <Text style={styles.bell}>🔔</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Chercher des vacances en avion"
+          placeholderTextColor="#777"
         />
       </View>
 
-      {}
-      <ScrollView style={{ flex: 1 }}>
-        {}
-        <View style={{ paddingHorizontal: 20 }}>
-          <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333' }}>Ou allons-nous ?</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: '#E8E8E8',
-              borderRadius: 10,
-              paddingHorizontal: 10,
-              marginTop: 10,
-              height: 50,
-            }}
-          >
-            {}
-            <Text>🔍</Text>
-            <TextInput
-              placeholder="Search a flight"
-              style={{ flex: 1, paddingHorizontal: 10 }}
-            />
-          </View>
+      {/* Last minute dates */}
+      <Text style={styles.sectionTitle}>Last minutes en...</Text>
+      <View style={styles.datesContainer}>
+        {['10/24', '11/24', '12/24'].map((date, index) => (
+          <TouchableOpacity key={index} style={styles.dateCard}>
+            <Text style={styles.dateIcon}>✈️</Text>
+            <Text style={styles.dateText}>{date}</Text>
+            <Text style={styles.monthText}>{['Octobre', 'Novembre', 'Décembre'][index]}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Cities by country */}
+      <View>
+        {/* Italy */}
+        <Text style={styles.countryTitle}>Italie</Text>
+        <View style={styles.citiesRow}>
+          {['Venise', 'Florence', 'Rome'].map((city, index) => (
+            <CityCard key={index} city={city} />
+          ))}
         </View>
 
-        {}
-        <View style={{ marginTop: 20, paddingHorizontal: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Vols disponibles</Text>
-          <FlatList
-            data={flightsData}
-            renderItem={renderFlight}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            style={{ marginVertical: 10 }}
+        {/* Spain */}
+        <Text style={styles.countryTitle}>Espagne</Text>
+        <View style={styles.citiesRow}>
+          {['Madrid', 'Tenerif', 'Andalousie'].map((city, index) => (
+            <CityCard4 key={index} city={city} />
+          ))}
+        </View>
+
+        {/* Greece */}
+        <Text style={styles.countryTitle}>Grèce</Text>
+        <View style={styles.citiesRow}>
+          {['Athènes', 'Mykonos', 'Crète'].map((city, index) => (
+            <CityCard3 key={index} city={city} />
+          ))}
+        </View>
+
+        {/* Portugal */}
+        <Text style={styles.countryTitle}>Portugal</Text>
+        <View style={styles.citiesRow}>
+          {['Lisbonne', 'Porto', 'Algarve'].map((city, index) => (
+            <CityCard2 key={index} city={city} />
+          ))}
+        </View>
+      </View>
+
+      {/* Footer Image - Clic déclenche l'appel à GPT */}
+      <View style={styles.footerImageContainer}>
+        <TouchableOpacity onPress={handleGPTClick}>
+          <Image
+            source={require('../assets/footerImage.png')}
+            style={styles.footerImage}
           />
-        </View>
-
-        {}
-        <View style={{ paddingHorizontal: 40, marginTop: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Places populaires</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }}>
-            <FlatList
-              horizontal
-              data={popularPlacesData}
-              renderItem={renderPopularPlace}
-              keyExtractor={(item) => item.id}
-            />
-          </ScrollView>
-        </View>
-        <View style={{ paddingHorizontal: 40, marginTop: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}></Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }}>
-            <FlatList
-              horizontal
-              data={popularPlacesData}
-              renderItem={renderPopularPlace}
-              keyExtractor={(item) => item.id}
-            />
-          </ScrollView>
-        </View>
-      </ScrollView>
-
-      {}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-          height: 60,
-          backgroundColor: "#FFF",
-          borderTopWidth: 1,
-          borderColor: "#E8E8E8",
-        }}
-      >
-        <TouchableOpacity>
-          {}
-          <Text>🏠</Text>
-          <Text>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text>✈️</Text>
-          <Text>Flights</Text>
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Text>👤</Text>
-          <Text>Profile</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Affichage de la réponse GPT */}
+      {gptResponse ? (
+        <View style={styles.responseContainer}>
+          <Text style={styles.responseText}>{gptResponse}</Text>
+        </View>
+      ) : null}
+    </ScrollView>
+  );
+};
+
+
+const CityCard = ({ city }) => {
+  return (
+    <View style={styles.cityCard}>
+      <Image
+        style={styles.cityImage}
+        source={{ uri: 'https://www.okvoyage.com/wp-content/uploads/2022/09/le-village-de-vernazza-dans-les-plus-beaux-paysages-ditalie-du-nord-1024x683.jpg' }}
+      />
+      <Text style={styles.cityText}>{city}</Text>
     </View>
   );
-}
+};
+
+const CityCard2 = ({ city }) => {
+  return (
+    <View style={styles.cityCard}>
+      {}
+      <Image
+        style={styles.cityImage}
+        source={{ uri: 'https://static3.depositphotos.com/1000970/121/i/450/depositphotos_1216797-stock-photo-beach-scene.jpg' }}
+      />
+      <Text style={styles.cityText}>{city}</Text>
+    </View>
+  );
+};
+
+const CityCard3 = ({ city }) => {
+  return (
+    <View style={styles.cityCard}>
+      {}
+      <Image
+        style={styles.cityImage}
+        source={{ uri: 'https://figuredart.com/cdn/shop/products/FA10051_f231e85f-deae-499a-ac90-5e0d359ab865_530x@2x.jpg?v=1639072560' }}
+      />
+      <Text style={styles.cityText}>{city}</Text>
+    </View>
+  );
+};
+
+const CityCard4= ({ city }) => {
+  return (
+    <View style={styles.cityCard}>
+      {}
+      <Image
+        style={styles.cityImage}
+        source={{ uri: 'https://www.civitatis.com/blog/wp-content/uploads/2021/04/medulas-parque-nacional-espana.jpg' }}
+      />
+      <Text style={styles.cityText}>{city}</Text>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F4F8F9',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+    backgroundColor: '#DFF2E1',
+  },
+  logo: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#f00',
+  },
+  bell: {
+    fontSize: 24,
+  },
+  searchContainer: {
+    padding: 20,
+    marginTop: 10,
+  },
+  searchBar: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 15,
+  },
+  sectionTitle: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  datesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+  },
+  dateCard: {
+    alignItems: 'center',
+    backgroundColor: '#EBF8F2',
+    padding: 10,
+    borderRadius: 10,
+    width: 80,
+  },
+  dateIcon: {
+    fontSize: 24,
+  },
+  dateText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  monthText: {
+    fontSize: 14,
+    color: '#777',
+  },
+  countryTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  citiesRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+  },
+  cityCard: {
+    alignItems: 'center',
+  },
+  cityImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  cityText: {
+    marginTop: 5,
+    fontSize: 14,
+  },
+  footerImageContainer: {
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  footerImage: {
+    width: 200,
+    height: 100,
+    resizeMode: 'contain',
+  },
+  responseContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  responseText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
+
+export default App;

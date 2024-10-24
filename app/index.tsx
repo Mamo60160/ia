@@ -1,15 +1,21 @@
-
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Image, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import askGPT from './server'; 
+import askGPT from './server';
+
 const App = () => {
   const [gptResponse, setGptResponse] = useState('');
+  const [userInput, setUserInput] = useState('');
 
   // Fonction pour gérer l'appel à GPT lors du clic
   const handleGPTClick = async () => {
-    const response = await askGPT('Quels sont les meilleurs endroits pour voyager ?');  // Exemple de question
-    setGptResponse(response);
-    Alert.alert('Réponse GPT', response);  // Affiche la réponse dans une alerte
+    if (!userInput.trim()) {
+      Alert.alert('Erreur', 'Veuillez entrer une question.');
+      return;
+    }
+    
+    const response = await askGPT(userInput); 
+    Alert.alert('Réponse GPT', response);  
+    setUserInput('');
   };
 
   return (
@@ -78,8 +84,15 @@ const App = () => {
         </View>
       </View>
 
-      {/* Footer Image - Clic déclenche l'appel à GPT */}
-      <View style={styles.footerImageContainer}>
+      {/* Input pour discuter avec GPT */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.userInput}
+          placeholder="Posez votre question ici..."
+          placeholderTextColor="#777"
+          value={userInput}
+          onChangeText={setUserInput}
+        />
         <TouchableOpacity onPress={handleGPTClick}>
           <Image
             source={require('../assets/footerImage.png')}
@@ -98,7 +111,6 @@ const App = () => {
   );
 };
 
-
 const CityCard = ({ city }) => {
   return (
     <View style={styles.cityCard}>
@@ -114,7 +126,6 @@ const CityCard = ({ city }) => {
 const CityCard2 = ({ city }) => {
   return (
     <View style={styles.cityCard}>
-      {}
       <Image
         style={styles.cityImage}
         source={{ uri: 'https://static3.depositphotos.com/1000970/121/i/450/depositphotos_1216797-stock-photo-beach-scene.jpg' }}
@@ -127,7 +138,6 @@ const CityCard2 = ({ city }) => {
 const CityCard3 = ({ city }) => {
   return (
     <View style={styles.cityCard}>
-      {}
       <Image
         style={styles.cityImage}
         source={{ uri: 'https://figuredart.com/cdn/shop/products/FA10051_f231e85f-deae-499a-ac90-5e0d359ab865_530x@2x.jpg?v=1639072560' }}
@@ -137,10 +147,9 @@ const CityCard3 = ({ city }) => {
   );
 };
 
-const CityCard4= ({ city }) => {
+const CityCard4 = ({ city }) => {
   return (
     <View style={styles.cityCard}>
-      {}
       <Image
         style={styles.cityImage}
         source={{ uri: 'https://www.civitatis.com/blog/wp-content/uploads/2021/04/medulas-parque-nacional-espana.jpg' }}
@@ -233,18 +242,27 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 14,
   },
-  footerImageContainer: {
+  inputContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 30,
-    marginBottom: 20,
+    padding: 20,
+  },
+  userInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    paddingVertical: 100,
+    paddingHorizontal: 20,
+    fontSize: 15,
+    marginRight: 10,
   },
   footerImage: {
-    width: 200,
-    height: 100,
+    width: 50,
+    height: 250,
     resizeMode: 'contain',
   },
   responseContainer: {
-    padding: 20,
+    padding: 120,
     alignItems: 'center',
   },
   responseText: {

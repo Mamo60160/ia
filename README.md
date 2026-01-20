@@ -1,50 +1,25 @@
-# Welcome to your Expo app 👋
+# Nimbus RH - Demo chatbot cloud
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Demo web statique pour une equipe RH, concue pour les presentations commerciales.
 
-## Get started
+## Lancer la demo
 
-1. Install dependencies
+Option 1 (la plus simple) :
+- ouvrir `index.html` dans un navigateur
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+Option 2 (serveur local) :
 ```bash
-npm run reset-project
+npm run dev
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Puis ouvrir http://localhost:5173
 
-## Learn more
+## Fonctionnalites
 
-To learn more about developing your project with Expo, look at the following resources:
+- Conversation avec reponses predefinies
+- Actions rapides (FAQ RH, upload de CV, prise de RDV)
+- Theme cloud avec cartes et bulles de discussion
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Personnalisation rapide
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Tout se trouve dans `index.html` (styles et logique).

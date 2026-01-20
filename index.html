@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nimbus RH - Chatbot cloud</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Segoe UI", system-ui, sans-serif;
+        --blue-900: #0b2c4a;
+        --blue-700: #1f5aa8;
+        --blue-600: #1f7ae0;
+        --blue-200: #d8ecff;
+        --blue-100: #ecf6ff;
+        --card: rgba(255, 255, 255, 0.95);
+        --shadow: 0 14px 30px rgba(11, 31, 54, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(180deg, #eaf6ff 0%, #d2ecff 45%, #b7d9ff 100%);
+        color: var(--blue-900);
+      }
+
+      .page {
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+      }
+
+      .clouds {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+      }
+
+      .cloud {
+        position: absolute;
+        width: 220px;
+        height: 70px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.5);
+        filter: blur(0.5px);
+      }
+
+      .cloud::before,
+      .cloud::after {
+        content: "";
+        position: absolute;
+        background: inherit;
+        border-radius: 50%;
+      }
+
+      .cloud::before {
+        width: 90px;
+        height: 90px;
+        top: -45px;
+        left: 20px;
+      }
+
+      .cloud::after {
+        width: 120px;
+        height: 120px;
+        top: -60px;
+        right: 30px;
+      }
+
+      .cloud.one {
+        top: 30px;
+        right: -20px;
+      }
+
+      .cloud.two {
+        top: 160px;
+        left: -40px;
+        width: 180px;
+        height: 60px;
+      }
+
+      .cloud.three {
+        bottom: 120px;
+        right: 40px;
+        width: 240px;
+        height: 75px;
+      }
+
+      .container {
+        position: relative;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+        z-index: 1;
+      }
+
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card);
+        border-radius: 22px;
+        padding: 20px 22px;
+        box-shadow: var(--shadow);
+        gap: 16px;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+        margin: 0;
+        font-weight: 700;
+      }
+
+      .hero p {
+        margin: 6px 0 0;
+        color: #4b6c8f;
+        font-size: 14px;
+      }
+
+      .badge {
+        background: var(--blue-600);
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        color: #365a7e;
+        font-weight: 600;
+        box-shadow: var(--shadow);
+      }
+
+      .section {
+        margin-top: 24px;
+      }
+
+      .section h2 {
+        margin: 0 0 12px;
+        font-size: 18px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+        margin-bottom: 14px;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .card p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: #4b6c8f;
+      }
+
+      .chip-row,
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .chip {
+        border: none;
+        background: #e6f1ff;
+        color: var(--blue-700);
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 16px;
+        cursor: pointer;
+      }
+
+      .chip:hover {
+        background: #d5e8ff;
+      }
+
+      .upload {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .upload span {
+        flex: 1;
+        font-size: 12px;
+        color: #2c4e72;
+      }
+
+      .upload button {
+        background: var(--blue-600);
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .chat-card {
+        background: var(--card);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      #messages {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        max-height: 440px;
+        overflow-y: auto;
+        padding-right: 6px;
+      }
+
+      .message-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .message-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+      }
+
+      .message-row.user {
+        justify-content: flex-end;
+      }
+
+      .message-row.bot {
+        justify-content: flex-start;
+      }
+
+      .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #e7f3ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--blue-700);
+      }
+
+      .bubble {
+        max-width: 78%;
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .bubble.bot {
+        background: #f0f7ff;
+        border-top-left-radius: 6px;
+        color: #1b3c5a;
+      }
+
+      .bubble.user {
+        background: var(--blue-600);
+        border-top-right-radius: 6px;
+        color: #fff;
+      }
+
+      .bubble .time {
+        display: block;
+        margin-top: 6px;
+        font-size: 10px;
+        color: #5e7a99;
+      }
+
+      .bubble.user .time {
+        color: #ddebff;
+        text-align: right;
+      }
+
+      .chip-row.bot {
+        margin-left: 36px;
+      }
+
+      .chip-row .chip {
+        background: #fff;
+        border: 1px solid #c9e0ff;
+      }
+
+      .input-row {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        background: #f5faff;
+        border-radius: 16px;
+        padding: 10px 12px;
+      }
+
+      .input-row input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        color: #1b3c5a;
+        outline: none;
+      }
+
+      .input-row button {
+        background: var(--blue-600);
+        color: #fff;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      @media (max-width: 720px) {
+        .hero {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .badge {
+          align-self: flex-start;
+        }
+
+        .bubble {
+          max-width: 100%;
+        }
+
+        #messages {
+          max-height: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="clouds">
+        <div class="cloud one"></div>
+        <div class="cloud two"></div>
+        <div class="cloud three"></div>
+      </div>
+
+      <main class="container">
+        <header class="hero">
+          <div>
+            <h1>Nimbus RH</h1>
+            <p>Assistant RH cloud pour demo commerciale</p>
+          </div>
+          <span class="badge">DEMO</span>
+        </header>
+
+        <div class="stats">
+          <div class="stat">24/7</div>
+          <div class="stat">Donnees chiffrees</div>
+          <div class="stat">Reponse 1s</div>
+        </div>
+
+        <section class="section">
+          <h2>Actions rapides</h2>
+
+          <div class="card">
+            <h3>FAQ RH</h3>
+            <p>Conges, paie, teletravail, onboarding, avantages</p>
+            <div class="chips">
+              <button class="chip" data-value="Infos sur les conges">Conges</button>
+              <button class="chip" data-value="Infos sur la paie">Paie</button>
+              <button class="chip" data-value="Infos sur le teletravail">Teletravail</button>
+              <button class="chip" data-value="Aide pour l'onboarding">Onboarding</button>
+              <button class="chip" data-value="Quels sont les avantages">Avantages</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Uploader un CV</h3>
+            <p>PDF / DOCX, stockage cloud securise</p>
+            <div class="upload">
+              <span id="fileName">Aucun fichier selectionne</span>
+              <input id="fileInput" type="file" accept=".pdf,.doc,.docx" hidden />
+              <button id="uploadButton" type="button">Choisir</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Prendre RDV</h3>
+            <p>Creneaux de 15 min avec RH</p>
+            <div class="chips">
+              <button class="chip" data-value="Je confirme Mardi 10:00">Mardi 10:00</button>
+              <button class="chip" data-value="Je confirme Mercredi 14:30">
+                Mercredi 14:30
+              </button>
+              <button class="chip" data-value="Je confirme Jeudi 09:00">Jeudi 09:00</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Conversation</h2>
+          <div class="chat-card">
+            <div id="messages"></div>
+            <div class="input-row">
+              <input id="userInput" type="text" placeholder="Posez une question RH..." />
+              <button id="sendButton" type="button">Envoyer</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const rdvSlots = ["Mardi 10:00", "Mercredi 14:30", "Jeudi 09:00"];
+      const faqTopics = [
+        { label: "Conges", value: "Infos sur les conges" },
+        { label: "Paie", value: "Infos sur la paie" },
+        { label: "Teletravail", value: "Infos sur le teletravail" },
+        { label: "Onboarding", value: "Aide pour l'onboarding" },
+        { label: "Avantages", value: "Quels sont les avantages" },
+      ];
+      const defaultSuggestions = [
+        { label: "FAQ RH", value: "Montre-moi la FAQ RH" },
+        { label: "Uploader un CV", value: "Je veux deposer un CV" },
+        { label: "Prendre RDV", value: "Je veux prendre un rendez-vous" },
+        { label: "Recrutement", value: "Je veux un apercu du recrutement" },
+      ];
+
+      const messages = [];
+      let messageCounter = 1;
+
+      const messagesEl = document.getElementById("messages");
+      const inputEl = document.getElementById("userInput");
+      const sendButton = document.getElementById("sendButton");
+      const fileNameEl = document.getElementById("fileName");
+      const fileInputEl = document.getElementById("fileInput");
+      const uploadButton = document.getElementById("uploadButton");
+
+      const normalizeText = (value) =>
+        value
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+
+      const getTimeLabel = () =>
+        new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+
+      const createMessage = (sender, text, chips = []) => ({
+        id: `msg-${messageCounter++}`,
+        sender,
+        text,
+        time: getTimeLabel(),
+        chips,
+      });
+
+      const includesAny = (normalized, keywords) =>
+        keywords.some((keyword) => normalized.includes(keyword));
+
+      const getBotReply = (message) => {
+        const normalized = normalizeText(message);
+
+        if (includesAny(normalized, ["bonjour", "salut", "hello"])) {
+          return {
+            text:
+              "Bonjour ! Je suis Nimbus, votre assistant RH dans le cloud. Je peux vous aider sur les conges, la paie, le teletravail, l'onboarding, le recrutement et les CV.",
+            chips: defaultSuggestions,
+          };
+        }
+
+        if (includesAny(normalized, ["merci", "top", "super"])) {
+          return { text: "Avec plaisir ! Je reste disponible si vous avez d'autres questions." };
+        }
+
+        if (includesAny(normalized, ["confirme", "confirmation"])) {
+          return {
+            text:
+              "Parfait, RDV confirme. L'invitation est envoyee et ajoutee au calendrier cloud RH.",
+          };
+        }
+
+        if (includesAny(normalized, ["statut", "suivre"])) {
+          return {
+            text:
+              "Statut candidature : en revue. Prochaine etape : entretien RH. Vous recevrez une notification.",
+          };
+        }
+
+        if (includesAny(normalized, ["lettre", "motivation"])) {
+          return {
+            text:
+              "Lettre ajoutee au dossier candidat (PDF recommande). Le tout est conserve dans le coffre-fort cloud.",
+          };
+        }
+
+        if (includesAny(normalized, ["rdv", "rendez", "entretien", "meeting"])) {
+          return {
+            text:
+              "Je peux planifier un RDV de 15 min avec RH. Voici des creneaux disponibles cette semaine.",
+            chips: rdvSlots.map((slot) => ({ label: slot, value: `Je confirme ${slot}` })),
+          };
+        }
+
+        if (includesAny(normalized, ["faq", "foire"])) {
+          return {
+            text: "Voici les themes de la FAQ RH. Choisissez un sujet.",
+            chips: faqTopics,
+          };
+        }
+
+        if (includesAny(normalized, ["conge", "conges", "rtt", "absence"])) {
+          return {
+            text:
+              "Pour poser un conge : 1) ouvrir le portail RH, 2) choisir les dates, 3) validation manager. Le solde est mis a jour en temps reel.",
+            chips: [
+              { label: "Poser un conge", value: "Je veux poser un conge" },
+              { label: "Voir mon solde", value: "Quel est mon solde de conges" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["paie", "salaire", "bulletin", "fiche"])) {
+          return {
+            text:
+              "Les bulletins de paie sont disponibles le 28 du mois dans le coffre-fort RH. En cas de correction, delai moyen : 48h.",
+            chips: [
+              { label: "Voir mon bulletin", value: "Je veux mon bulletin de paie" },
+              { label: "Signaler une erreur", value: "Je veux signaler une erreur de paie" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["teletravail", "remote", "hybride"])) {
+          return {
+            text:
+              "Politique teletravail : jusqu a 2 jours par semaine, planning partage via le portail cloud RH.",
+            chips: [
+              { label: "Demander un jour", value: "Je veux demander un jour de teletravail" },
+              { label: "Charte", value: "Afficher la charte teletravail" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["onboarding", "integration", "arrivee", "arrive", "nouveau"])) {
+          return {
+            text:
+              "Checklist d'onboarding : contrat signe, materiel livre, acces cloud, point J+7. Tout est suivi dans un tableau unique.",
+            chips: [
+              { label: "Checklist", value: "Voir la checklist d'onboarding" },
+              { label: "Acces IT", value: "Activer mes acces IT" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["recrutement", "poste", "candidature"])) {
+          return {
+            text:
+              "Le module recrutement permet de creer une fiche de poste, diffuser et suivre les candidats en temps reel.",
+            chips: [
+              { label: "Deposer un CV", value: "Je veux deposer un CV" },
+              { label: "Suivre candidature", value: "Je veux suivre ma candidature" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["cv", "televerse", "upload", "deposer"])) {
+          return {
+            text:
+              "CV recu et chiffre dans le coffre-fort cloud RH. Format PDF recommande, analyse automatique sous 2 minutes.",
+            chips: [
+              { label: "Voir le statut", value: "Quel est le statut de ma candidature" },
+              { label: "Ajouter une lettre", value: "Je veux ajouter une lettre de motivation" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["avantage", "mutuelle", "ticket", "benefit"])) {
+          return {
+            text:
+              "Avantages principaux : mutuelle premium, tickets resto, budget formation et mobilite durable.",
+            chips: [
+              { label: "Details mutuelle", value: "Je veux les details mutuelle" },
+              { label: "Budget formation", value: "Quel est le budget formation" },
+            ],
+          };
+        }
+
+        if (includesAny(normalized, ["formation", "learning", "competence"])) {
+          return {
+            text:
+              "Catalogue cloud learning : plus de 200 modules. Inscription en 1 clic, suivi des acquis automatique.",
+            chips: [
+              { label: "Voir le catalogue", value: "Ouvrir le catalogue formation" },
+              { label: "Mes credits", value: "Consulter mes credits formation" },
+            ],
+          };
+        }
+
+        return {
+          text:
+            "Je peux aider sur la FAQ RH, les conges, la paie, le teletravail, l'onboarding, le recrutement, les CV et les RDV.",
+          chips: defaultSuggestions,
+        };
+      };
+
+      const renderMessages = () => {
+        messagesEl.innerHTML = "";
+
+        messages.forEach((message) => {
+          const group = document.createElement("div");
+          group.className = "message-group";
+
+          const row = document.createElement("div");
+          row.className = `message-row ${message.sender}`;
+
+          if (message.sender === "bot") {
+            const avatar = document.createElement("div");
+            avatar.className = "avatar";
+            avatar.textContent = "N";
+            row.appendChild(avatar);
+          }
+
+          const bubble = document.createElement("div");
+          bubble.className = `bubble ${message.sender}`;
+          bubble.textContent = message.text;
+
+          const time = document.createElement("span");
+          time.className = "time";
+          time.textContent = message.time;
+          bubble.appendChild(time);
+          row.appendChild(bubble);
+          group.appendChild(row);
+
+          if (message.chips && message.chips.length) {
+            const chipRow = document.createElement("div");
+            chipRow.className = `chip-row ${message.sender}`;
+            message.chips.forEach((chip) => {
+              const chipButton = document.createElement("button");
+              chipButton.className = "chip";
+              chipButton.type = "button";
+              chipButton.dataset.value = chip.value;
+              chipButton.textContent = chip.label;
+              chipRow.appendChild(chipButton);
+            });
+            group.appendChild(chipRow);
+          }
+
+          messagesEl.appendChild(group);
+        });
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      };
+
+      const addMessage = (sender, text, chips) => {
+        messages.push(createMessage(sender, text, chips));
+        renderMessages();
+      };
+
+      const sendUserMessage = (text) => {
+        const trimmed = text.trim();
+        if (!trimmed) return;
+        addMessage("user", trimmed);
+        const reply = getBotReply(trimmed);
+        addMessage("bot", reply.text, reply.chips);
+      };
+
+      sendButton.addEventListener("click", () => {
+        sendUserMessage(inputEl.value);
+        inputEl.value = "";
+        inputEl.focus();
+      });
+
+      inputEl.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendUserMessage(inputEl.value);
+          inputEl.value = "";
+        }
+      });
+
+      document.body.addEventListener("click", (event) => {
+        const target = event.target.closest("button[data-value]");
+        if (!target) return;
+        sendUserMessage(target.dataset.value);
+      });
+
+      uploadButton.addEventListener("click", () => fileInputEl.click());
+
+      fileInputEl.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        fileNameEl.textContent = file.name;
+        sendUserMessage(`J'ai televerse ${file.name}.`);
+        fileInputEl.value = "";
+      });
+
+      addMessage(
+        "bot",
+        "Bienvenue ! Je suis Nimbus, le chatbot RH cloud. Dites-moi ce dont vous avez besoin.",
+        defaultSuggestions
+      );
+      addMessage(
+        "bot",
+        "Vous pouvez aussi utiliser les actions rapides ci-dessous pour une demo commerciale.",
+        [
+          { label: "FAQ RH", value: "Montre-moi la FAQ RH" },
+          { label: "Uploader un CV", value: "Je veux deposer un CV" },
+          { label: "Prendre RDV", value: "Je veux prendre un rendez-vous" },
+        ]
+      );
+    </script>
+  </body>
+</html>
